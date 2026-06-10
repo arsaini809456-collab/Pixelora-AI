@@ -6,6 +6,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const prompt = body?.prompt;
+    const style = body?.style;
+
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return NextResponse.json(
@@ -24,8 +26,37 @@ export async function POST(request: NextRequest) {
     }
 
     const originalPrompt = prompt.trim();
+    const finalStyle = typeof style === "string" && style.trim() ? style.trim() : "Realistic";
+    const finalThumbnailType =
+      typeof body?.thumbnailType === "string" && body.thumbnailType.trim()
+        ? body.thumbnailType.trim()
+        : "video";
+
+
+    const styleInstruction = (() => {
+      const s = finalStyle.toLowerCase();
+      if (s === "anime") return "Anime style illustration with clean linework, vibrant colors, and expressive eyes.";
+      if (s === "logo") return "Clean modern logo design, minimal shapes, strong contrast, and readable typography.";
+      if (s === "wallpaper") return "Vertical 9:16 wallpaper design, high detail, balanced composition, and modern color grading.";
+      if (s === "3d art") return "High quality 3D render, realistic materials, studio lighting, and cinematic depth of field.";
+      if (s === "pinterest") return "Aesthetic Pinterest-style image prompt, trending composition, soft tones, and photogenic details.";
+      // YouTube prompts are controlled by thumbnailType.
+      if (s === "youtube thumbnail") {
+        if (finalThumbnailType === "shorts") {
+          return "Create a vertical 9:16 YouTube Shorts thumbnail prompt with centered subject, energetic style, clean background, and high visual impact.";
+        }
+
+        // default to video thumbnail
+        return "Create a highly clickable 16:9 YouTube thumbnail prompt with a bold main subject, dramatic lighting, vibrant colors, high contrast, clear focal point, space for text, and a professional thumbnail composition.";
+      }
+
+
+      return "Ultra realistic photography, natural lighting, high detail, and cinematic color grading.";
+
+    })();
 
     const groqResponse = await fetch(
+
       "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
@@ -43,7 +74,7 @@ export async function POST(request: NextRequest) {
             },
             {
               role: "user",
-              content: originalPrompt,
+              content: `${originalPrompt}\n\nStyle: ${finalStyle}. ${styleInstruction}`,
             },
           ],
           temperature: 0.8,

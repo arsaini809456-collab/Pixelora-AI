@@ -8,6 +8,13 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [enhancing, setEnhancing] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState<string>("Realistic");
+  const [thumbnailType, setThumbnailType] = useState<string>("video");
+
+
+
+
+
 
 
   const canGenerate = useMemo(() => {
@@ -97,17 +104,57 @@ export default function Page() {
               />
             </div>
 
-            <button
-              onClick={onGenerate}
-              disabled={!canGenerate}
-              className={`mt-1 inline-flex w-full items-center justify-center rounded-2xl px-5 py-4 text-sm font-bold transition sm:text-base ${
-                canGenerate
-                  ? "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:brightness-110"
-                  : "cursor-not-allowed bg-white/10 text-white/50"
-              }`}
-            >
-              {loading ? "Generating..." : "Generate Image"}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Realistic",
+                "Anime",
+                "Logo",
+                "Wallpaper",
+                "3D Art",
+                "Pinterest",
+                "YouTube Thumbnail",
+              ].map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  onClick={() => setSelectedStyle(style)}
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    selectedStyle === style
+                      ? "border-purple-400/60 bg-purple-400/15 text-white"
+                      : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
+                  }`}
+                >
+                  {style}
+                </button>
+              ))}
+            </div>
+
+            {selectedStyle === "YouTube Thumbnail" ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setThumbnailType("video")}
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    thumbnailType === "video"
+                      ? "border-purple-400/60 bg-purple-400/15 text-white"
+                      : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
+                  }`}
+                >
+                  Video
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setThumbnailType("shorts")}
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    thumbnailType === "shorts"
+                      ? "border-purple-400/60 bg-purple-400/15 text-white"
+                      : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
+                  }`}
+                >
+                  Shorts
+                </button>
+              </div>
+            ) : null}
 
             <button
               onClick={async () => {
@@ -121,7 +168,14 @@ export default function Page() {
                     headers: {
                       "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ prompt: prompt.trim() }),
+                    body: JSON.stringify({
+                      prompt: prompt.trim(),
+                      style: selectedStyle,
+                      thumbnailType:
+                        selectedStyle === "YouTube Thumbnail"
+                          ? thumbnailType
+                          : undefined,
+                    }),
                   });
 
                   const data = (await res.json().catch(() => ({}))) as {
@@ -155,13 +209,53 @@ export default function Page() {
               {enhancing ? "Enhancing..." : "Enhance Prompt"}
             </button>
 
+            <button
+              onClick={onGenerate}
+              disabled={!canGenerate}
+              className={`mt-1 inline-flex w-full items-center justify-center rounded-2xl px-5 py-4 text-sm font-bold transition sm:text-base ${
+                canGenerate
+                  ? "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:brightness-110"
+                  : "cursor-not-allowed bg-white/10 text-white/50"
+              }`}
+            >
+              {loading ? "Generating..." : "Generate Image"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setPrompt("");
+                setError(null);
+              }}
+              className="inline-flex w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+            >
+              Clear Prompt
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setPrompt("");
+                setError(null);
+                setImageUrl(null);
+                setSelectedStyle("Realistic");
+                setThumbnailType("video");
+                setLoading(false);
+                setEnhancing(false);
+              }}
+              className="inline-flex w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+            >
+              Reset All
+            </button>
 
             {error ? (
+
               <div className="rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
                 <div className="font-semibold">Error</div>
                 <div className="mt-1 break-words">{error}</div>
               </div>
             ) : null}
+
 
             <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
               <div className="flex items-center justify-between gap-4">

@@ -25,7 +25,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("Original prompt:", prompt);
+
+    let finalPrompt = prompt.trim();
+
+    const groqApiKey = process.env.GROQ_API_KEY;
+
+    if (groqApiKey) {
+      try {
+        const groqResponse = await fetch(
+          "https://api.groq.com/openai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${groqApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "llama-3.1-8b-instant",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "You are an expert AI image prompt engineer. Convert short user ideas into detailed image generation prompts. Return only the final prompt, no explanation.",
+                },
+                {
+                  role: "user",
+                  content: prompt.trim(),
+                },
+              ],
+              temperature: 0.8,
+              max_tokens: 200,
+            }),
+          }
+        );
+
+        if (groqResponse.ok) {
+          const groqData = await groqResponse.json().catch(() => null);
+          const enhancedPrompt =
+            groqData?.choices?.[0]?.message?.content;
+
+          if (typeof enhancedPrompt === "string" && enhancedPrompt.trim()) {
+            finalPrompt = enhancedPrompt.trim();
+          }
+        } else {
+          const groqErrorText = await groqResponse.text().catch(() => "");
+          console.error("Groq API error:", groqErrorText);
+        }
+      } catch (e) {
+        console.error("Groq prompt enhancement failed:", e);
+      }
+    }
+
+    console.log("Enhanced prompt:", finalPrompt);
+
     const response = await fetch(
+
       "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
       {
         method: "POST",
@@ -35,11 +90,12 @@ export async function POST(request: NextRequest) {
           Accept: "image/png",
         },
         body: JSON.stringify({
-          inputs: prompt.trim(),
+          inputs: finalPrompt,
           options: {
             wait_for_model: true,
           },
         }),
+
       }
     );
 
