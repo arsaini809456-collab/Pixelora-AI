@@ -1,6 +1,28 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Image from "next/image";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+
+const GeneratedPreview = ({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) => (
+  <Image
+    src={src}
+    alt={alt}
+    width={1024}
+    height={1024}
+    unoptimized
+    className="h-auto max-h-[320px] sm:max-h-[420px] w-full rounded-2xl border border-white/10 object-contain"
+  />
+);
+
 
 export default function Page() {
   const [prompt, setPrompt] = useState<string>("");
@@ -8,8 +30,11 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [enhancing, setEnhancing] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState<string | null>(null);
+  const [enhanceStatus, setEnhanceStatus] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>("Realistic");
   const [thumbnailType, setThumbnailType] = useState<string>("video");
+
 
 
 
@@ -21,6 +46,9 @@ export default function Page() {
     return !loading && prompt.trim().length > 0;
   }, [loading, prompt]);
 
+
+
+
   async function onGenerate() {
     const trimmed = prompt.trim();
     // Generate image ONLY (no Groq enhance here)
@@ -28,8 +56,21 @@ export default function Page() {
     if (!trimmed) {
       setError("Please type a prompt.");
       setImageUrl(null);
+      setGenerationStatus(null);
       return;
     }
+
+    setGenerationStatus("Preparing your prompt...");
+    await sleep(800);
+
+    setGenerationStatus("Connecting to image model...");
+    await sleep(800);
+
+    setGenerationStatus("Generating your image...");
+    await sleep(800);
+
+    setGenerationStatus("Almost ready...");
+    await sleep(800);
 
     setLoading(true);
     setError(null);
@@ -37,6 +78,8 @@ export default function Page() {
 
     try {
       const res = await fetch("/api/generate", {
+
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,8 +107,10 @@ export default function Page() {
       setError("Something went wrong while generating the image.");
     } finally {
       setLoading(false);
+      setGenerationStatus(null);
     }
   }
+
 
   function onDownload() {
     if (!imageUrl) return;
@@ -81,18 +126,18 @@ export default function Page() {
   return (
     <main className="min-h-screen w-full bg-gradient-to-b from-[#050617] via-[#050617] to-[#02030a] text-white">
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-14">
-        <header className="mb-8 text-center">
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+        <header className="mb-6 px-1 text-center sm:mb-8">
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
             <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-400 bg-clip-text text-transparent">
               Pixelora AI
             </span>
           </h1>
-            <p className="mt-3 text-sm text-white/70 sm:text-base">
+            <p className="mt-2 text-sm text-white/70 sm:mt-3 sm:text-base">
               Create stunning AI images from simple prompts.
             </p>
         </header>
 
-        <section className="w-full rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_0_80px_-20px_rgba(236,72,153,0.25)] backdrop-blur-xl">
+        <section className="w-full rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 shadow-[0_0_80px_-20px_rgba(236,72,153,0.25)] backdrop-blur-xl">
           <div className="flex flex-col gap-4">
             <div>
               <label className="text-sm font-semibold text-white/80">
@@ -102,7 +147,7 @@ export default function Page() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="e.g., A futuristic city at sunset, cinematic lighting"
-                className="mt-2 min-h-[140px] w-full resize-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-400/25"
+                className="mt-2 min-h-[120px] sm:min-h-[140px] w-full resize-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-400/25"
               />
             </div>
 
@@ -164,6 +209,13 @@ export default function Page() {
                 setEnhancing(true);
                 setError(null);
 
+                setEnhanceStatus("Improving your prompt...");
+                await sleep(800);
+                setEnhanceStatus("Adding style details...");
+                await sleep(800);
+                setEnhanceStatus("Finalizing enhanced prompt...");
+                await sleep(800);
+
                 try {
                   const res = await fetch("/api/enhance", {
                     method: "POST",
@@ -179,7 +231,6 @@ export default function Page() {
                           : undefined,
                     }),
                   });
-
 
                   const data = (await res.json().catch(() => ({}))) as {
                     enhancedPrompt?: string;
@@ -200,6 +251,7 @@ export default function Page() {
                   setError("Something went wrong while enhancing the prompt.");
                 } finally {
                   setEnhancing(false);
+                  setEnhanceStatus(null);
                 }
               }}
               disabled={enhancing || !prompt.trim()}
@@ -212,12 +264,21 @@ export default function Page() {
               {enhancing ? "Enhancing..." : "Enhance Prompt"}
             </button>
 
+            {enhanceStatus ? (
+              <div className="mt-3 text-center text-sm font-semibold text-purple-300 animate-pulse">
+                {enhanceStatus}
+              </div>
+            ) : null}
+
             <button
               onClick={() => {
                 onGenerate();
               }}
 
+
               disabled={!canGenerate}
+
+
 
               className={`mt-1 inline-flex w-full items-center justify-center rounded-2xl px-5 py-4 text-sm font-bold transition sm:text-base ${
                 canGenerate
@@ -227,6 +288,12 @@ export default function Page() {
             >
               {loading ? "Generating..." : "Generate Image"}
             </button>
+
+            {generationStatus && (
+              <p className="mt-3 text-center text-sm font-semibold text-purple-300 animate-pulse">
+                {generationStatus}
+              </p>
+            )}
 
             <button
               type="button"
@@ -272,14 +339,11 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col items-center gap-4">
+              <div className="mt-4 flex flex-col items-center gap-4 sm:gap-5">
                 {imageUrl ? (
                   <>
-                    <img
-                      src={imageUrl}
-                      alt="Generated"
-                      className="max-h-[420px] w-full rounded-2xl border border-white/10 object-contain"
-                    />
+                    <GeneratedPreview src={imageUrl} alt="Generated" />
+
 
                     <button
                       onClick={onDownload}
