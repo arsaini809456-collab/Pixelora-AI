@@ -86,6 +86,29 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Generate route error:", error);
 
+    const err = error as any;
+    const message =
+      typeof err?.message === "string" ? err.message : String(err ?? "");
+    const name = typeof err?.name === "string" ? err.name : "";
+    const combined = `${name} ${message}`.toLowerCase();
+
+    const isConnectTimeout =
+      combined.includes("und_err_connect_timeout") ||
+      combined.includes("fetch failed") ||
+      combined.includes("timeout") ||
+      combined.includes("connect timeout") ||
+      combined.includes("etimedout");
+
+    if (isConnectTimeout) {
+      return NextResponse.json(
+        {
+          error:
+            "Image server is taking too long or network connection failed. Please try again.",
+        },
+        { status: 504 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Something went wrong while generating image." },
       { status: 500 }
