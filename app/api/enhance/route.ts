@@ -93,12 +93,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const groqData = (await groqResponse.json().catch(() => null)) as any;
+    const groqData = (await groqResponse.json().catch(() => null)) as unknown;
 
     const enhancedPrompt =
-      groqData?.choices?.[0]?.message?.content;
+      (groqData as { choices?: Array<{ message?: { content?: unknown } }> })?.choices?.[0]
+        ?.message?.content;
+
 
     if (!enhancedPrompt || typeof enhancedPrompt !== "string") {
+
       return NextResponse.json(
         { error: "Groq did not return an enhanced prompt." },
         { status: 500 }
@@ -111,8 +114,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Enhance route error:", error);
 
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
+
     return NextResponse.json(
-      { error: "Something went wrong while enhancing the prompt." },
+      { error: `Something went wrong while enhancing the prompt. ${message}` },
       { status: 500 }
     );
   }

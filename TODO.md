@@ -1,7 +1,10 @@
-- [ ] Create branch: blackboxai/remove-groq-prompt-enhancement-generate-route
-- [x] Edit `app/api/generate/route.ts` to remove all prompt enhancement/modification logic (no Groq, no aspectRatio guidance)
-- [x] Ensure `/api/generate` sends only the frontend prompt (trimmed) to Hugging Face
-- [ ] Run typecheck/lint or `npm run build` to verify Next.js build
-- [ ] Smoke test endpoints: `/api/enhance` uses Groq; `/api/generate` does not call Groq
-
+- [ ] Ensure app/page.tsx compiles (no JSX nesting errors)
+- [ ] Add Puter optional generation button (label: "Generate with Puter")
+- [ ] Implement onClick handler using current prompt textarea value
+- [ ] Call puter.ai.txt2img() with model "gpt-image-2"
+- [ ] Render result into existing preview area using current imageUrl state
+- [ ] Do not call /api/generate and do not use Hugging Face
+- [ ] Do not edit app/api/generate/route.ts or app/api/enhance/route.ts
+- [ ] Show clear error message if Puter login/approval required or generation fails
+- [ ] Keep existing "Generate Image" button unchanged
 
