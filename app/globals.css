@@ -24,3 +24,66 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Landing page premium subtle background (CSS-only). Keep opacity low for readability. */
+.landing-hero-bg {
+  position: relative;
+  isolation: isolate;
+}
+
+.landing-hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: -80px -40px -120px -40px;
+  z-index: -2;
+  background:
+    radial-gradient(900px 520px at 20% 15%, rgba(168, 85, 247, 0.18), transparent 55%),
+    radial-gradient(720px 520px at 80% 20%, rgba(59, 130, 246, 0.14), transparent 52%),
+    radial-gradient(540px 420px at 50% 35%, rgba(236, 72, 153, 0.10), transparent 55%),
+    radial-gradient(420px 320px at 15% 55%, rgba(99, 102, 241, 0.10), transparent 55%),
+    radial-gradient(380px 320px at 90% 62%, rgba(34, 211, 238, 0.07), transparent 55%),
+    /* very subtle grid */
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    48px 48px,
+    48px 48px;
+  background-position:
+    center,
+    center,
+    center,
+    center,
+    center,
+    0 0,
+    0 0;
+  filter: blur(10px) saturate(110%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.landing-hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  /* subtle vignette + particle-ish dots */
+  background:
+    radial-gradient(1200px 500px at 50% 0%, rgba(168, 85, 247, 0.09), transparent 55%),
+    radial-gradient(900px 420px at 15% 70%, rgba(59, 130, 246, 0.07), transparent 60%),
+    radial-gradient(900px 420px at 85% 75%, rgba(236, 72, 153, 0.06), transparent 60%),
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.12) 0 1px, transparent 2px),
+    radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 30%, rgba(255, 255, 255, 0.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.09) 0 1px, transparent 2px);
+
+  opacity: 0.55; /* overall subtlety */
+  filter: blur(0.2px);
+}
+

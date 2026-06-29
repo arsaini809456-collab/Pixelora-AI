@@ -56,9 +56,10 @@ export default function Page() {
       </div>
 
       {/* Hero */}
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-14">
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-14 landing-hero-bg">
         <section className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="relative">
+
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur-xl">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.8)]" />
               Instant AI image generation for creators
