@@ -278,7 +278,7 @@ This project is licensed under the **MIT License**.
 
 # 👨‍💻 Author
 
-**Simple Boy**
+**Aryan Saini**
 
 GitHub
 
@@ -286,11 +286,11 @@ https://github.com/arsaini809456-collab
 
 LinkedIn
 
-(Add your LinkedIn Profile)
+www.linkedin.com/in/aryan-saini-6546b340b
 
 Portfolio
 
-(Add your Portfolio Website)
+(Not Avalable)
 
 ---
 
