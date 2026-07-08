@@ -1,7 +1,4 @@
-- [x] Refactor app/page.tsx to landing-only (remove all generation UI + state + API calls)
-- [x] Ensure landing buttons use router.push('/generate')
-- [x] Ensure app/generate/page.tsx contains only image generation UI and Back to Home goes to '/'
-- [x] Run npm.cmd run lint
-- [x] Run npx.cmd tsc --noEmit
-- [ ] Fix any lint/type errors
+- [ ] Verify README current sections for 🤝 Contributing / 📄 License / 👨‍💻 Author / ❤️ Acknowledgements
+- [ ] Update ONLY the requested README sections with required content
+- [ ] Confirm no other README sections are modified
 
